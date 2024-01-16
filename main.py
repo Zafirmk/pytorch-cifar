@@ -4,6 +4,7 @@ import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
 import torch.backends.cudnn as cudnn
+import wandb
 
 import torchvision
 import torchvision.transforms as transforms
@@ -14,6 +15,10 @@ import argparse
 from models import *
 from utils import progress_bar
 
+wandb.init(project = "CIFAR10")
+
+WANDB_API_KEY = os.environ.get("WANDB_API_KEY")
+WANDB_USERNAME = os.environ.get("WANDB_USERNAME")
 
 parser = argparse.ArgumentParser(description='PyTorch CIFAR10 Training')
 parser.add_argument('--lr', default=0.1, type=float, help='learning rate')
@@ -91,7 +96,6 @@ scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=200)
 
 # Training
 def train(epoch):
-    print('\nEpoch: %d' % epoch)
     net.train()
     train_loss = 0
     correct = 0
@@ -109,8 +113,12 @@ def train(epoch):
         total += targets.size(0)
         correct += predicted.eq(targets).sum().item()
 
-        progress_bar(batch_idx, len(trainloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
-                     % (train_loss/(batch_idx+1), 100.*correct/total, correct, total))
+    # Calculate average loss and accuracy
+    epoch_loss = train_loss / len(trainloader)
+    epoch_acc = 100. * correct / total
+
+    # Log metrics to wandb
+    wandb.log({"Training Epoch": epoch, "Training Accuracy": epoch_acc, "Training Loss": epoch_loss})
 
 
 def test(epoch):
@@ -133,19 +141,23 @@ def test(epoch):
             progress_bar(batch_idx, len(testloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
                          % (test_loss/(batch_idx+1), 100.*correct/total, correct, total))
 
-    # Save checkpoint.
-    acc = 100.*correct/total
-    if acc > best_acc:
+    # Calculate and log test accuracy and loss
+    test_acc = 100.*correct/total
+    wandb.log({"Test Epoch": epoch, "Test Accuracy": test_acc, "Test Loss": test_loss / len(testloader)})
+
+    # Save checkpoint if there is improvement in accuracy
+    if test_acc > best_acc:
         print('Saving..')
         state = {
             'net': net.state_dict(),
-            'acc': acc,
+            'acc': test_acc,
             'epoch': epoch,
         }
         if not os.path.isdir('checkpoint'):
             os.mkdir('checkpoint')
         torch.save(state, './checkpoint/ckpt.pth')
-        best_acc = acc
+        best_acc = test_acc
+
 
 
 for epoch in range(start_epoch, start_epoch+200):

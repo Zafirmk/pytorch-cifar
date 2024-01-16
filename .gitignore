@@ -1,0 +1,3 @@
+cifar10venv/
+.env
+wandb/
