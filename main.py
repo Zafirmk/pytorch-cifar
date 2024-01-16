@@ -4,7 +4,7 @@ import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
 import torch.backends.cudnn as cudnn
-import wandb
+# import wandb
 
 import torchvision
 import torchvision.transforms as transforms
@@ -14,10 +14,10 @@ import argparse
 
 from models import *
 
-wandb.init(project = "CIFAR10")
+# wandb.init(project = "CIFAR10")
 
-WANDB_API_KEY = os.environ.get("WANDB_API_KEY")
-WANDB_USERNAME = os.environ.get("WANDB_USERNAME")
+# WANDB_API_KEY = os.environ.get("WANDB_API_KEY")
+# WANDB_USERNAME = os.environ.get("WANDB_USERNAME")
 
 parser = argparse.ArgumentParser(description='PyTorch CIFAR10 Training')
 parser.add_argument('--lr', default=0.1, type=float, help='learning rate')
@@ -117,7 +117,7 @@ def train(epoch):
     epoch_acc = 100. * correct / total
 
     # Log metrics to wandb
-    wandb.log({"Training Epoch": epoch, "Training Accuracy": epoch_acc, "Training Loss": epoch_loss})
+    print({"Training Epoch": epoch, "Training Accuracy": epoch_acc, "Training Loss": epoch_loss})
 
 
 def test(epoch):
@@ -139,7 +139,7 @@ def test(epoch):
 
     # Calculate and log test accuracy and loss
     test_acc = 100.*correct/total
-    wandb.log({"Test Epoch": epoch, "Test Accuracy": test_acc, "Test Loss": test_loss / len(testloader)})
+    print({"Test Epoch": epoch, "Test Accuracy": test_acc, "Test Loss": test_loss / len(testloader)})
 
     # Save checkpoint if there is improvement in accuracy
     if test_acc > best_acc:
