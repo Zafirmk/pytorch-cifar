@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH -time=00:10:00
+#SBATCH --time=00:10:00
 #SBATCH --mail-user=z_khalid@live.concordia.ca
 #SBATCH --mail-type=ALL
 #SBATCH --account=rrg-eugenium
