@@ -10,5 +10,5 @@
 cd ~/projects/rrg-eugenium/zafirmk/pytorch-cifar
 module load
 module python/3.9
-source ~/projects/rrg-eugenium/zafirmk/pytorch-cifar/cifar10venv
+source ~/projects/rrg-eugenium/zafirmk/pytorch-cifar/cifar10venv/bin/activate
 python main.py
